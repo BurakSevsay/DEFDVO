@@ -1,0 +1,13 @@
+# DEFDVO inference config
+
+# VO config
+PATCHES_PER_FRAME: 192
+REMOVAL_WINDOW: 22
+OPTIMIZATION_WINDOW: 10
+PATCH_LIFETIME: 13
+
+# threshold for keyframe removal
+KEYFRAME_THRESH: 15.0
+
+# camera motion model
+MOTION_DAMPING: 0.5

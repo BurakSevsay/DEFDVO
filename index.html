@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DEFDVO: Deformable Deep Visual Odometry for Equirectangular Images</title>
+  <meta name="description" content="DEFDVO is a patch-based deep visual odometry method that operates directly on equirectangular 360° images (WACV 2027).">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DEFDVO: Deformable Deep Visual Odometry for Equirectangular Images">
+  <meta property="og:description" content="Patch-based deep visual odometry on equirectangular 360° images (WACV 2027).">
+  <meta property="og:url" content="https://buraksevsay.github.io/DEFDVO/">
+  <meta property="og:image" content="https://buraksevsay.github.io/DEFDVO/assets/defdvo_overview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <h1>DEFDVO: Deformable Deep Visual Odometry<br>for Equirectangular Images</h1>
+      <p class="venue">WACV 2027</p>
+      <p class="authors">
+        <a href="https://github.com/BurakSevsay" target="_blank" rel="noopener">Burak Sevsay</a><span class="sep">,</span>
+        <a href="https://www.tue.nl/en/research/researchers/egor-bondarau" target="_blank" rel="noopener">Egor Bondarev</a><span class="sep">,</span>
+        <a href="https://research.tue.nl/en/persons/erkut-akdag/" target="_blank" rel="noopener">Erkut Akdag</a>
+      </p>
+      <p class="affiliation">AIMS Group, Department of Electrical Engineering, Eindhoven University of Technology</p>
+      <nav class="links" aria-label="Project links">
+        <a class="pill" href="https://arxiv.org/abs/2611.19095" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+          <span>arXiv</span>
+        </a>
+        <a class="pill" href="https://github.com/BurakSevsay/DEFDVO" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>
+          <span>Code</span>
+        </a>
+      </nav>
+    </header>
+
+    <section>
+      <img class="figure" src="assets/defdvo_overview.png" alt="Overview of the DEFDVO pipeline: spherically initialized deformable encoder, spherical patch selection, and seam-aware tracking with spherical bundle adjustment.">
+      <p class="caption"><strong>DEFDVO overview.</strong> Given an equirectangular (ERP) stream, a spherically initialized deformable encoder extracts distortion-aware features, spherical-gradient selection samples informative patches on the viewing sphere, and seam-aware tracking with spherical bundle adjustment estimates the camera trajectory.</p>
+    </section>
+
+    <section>
+      <h2>Abstract</h2>
+      <p>Omnidirectional (360°) cameras capture the full surrounding scene in every frame, providing a strong advantage for visual odometry (VO) over pinhole sensors with a limited field of view. However, their equirectangular projection (ERP) introduces latitude-dependent distortion, an artificial seam at the image border, and a sampling bias toward the poles. Existing 360° VO methods address these challenges only partially. DEFDVO closes this gap with a patch-based deep VO method that operates directly on ERP imagery, combining spherically initialized deformable feature extraction, end-to-end seam-aware estimation, and spherical-gradient patch selection. The deformable feature extractor combines spherical geometric priors with learned sampling offsets, while seam-aware processing preserves ERP continuity, and spherical-gradient selection reduces polar sampling bias. Trained exclusively on synthetic TartanAirV2 ERP imagery, DEFDVO improves the best prior average absolute trajectory error (ATE) by 4.8× (0.201 m to 0.042 m) on the TartanAirV2 evaluation set (Set 1) and achieves the lowest average ATE on both splits of the real-world 360DVO benchmark.</p>
+    </section>
+
+    <section>
+      <h2>Method</h2>
+      <p>DEFDVO builds on the sparse patch-based formulation of DPVO and keeps the spherical geometry of ERP images consistent from feature extraction to bundle adjustment.</p>
+      <ul>
+        <li><strong>Spherically initialized deformable features.</strong> Modulated deformable convolutions (DCNv2) start from the analytic SphereNet sampling pattern and learn latitude-conditioned residual offsets on top of it.</li>
+        <li><strong>Seam-aware estimation.</strong> Circular padding, circular correlation and azimuth-wrapped residuals in bundle adjustment and in the training loss treat the ERP seam as an ordinary meridian of the sphere.</li>
+        <li><strong>Spherical-gradient patch selection.</strong> Patch candidates are drawn uniformly on the sphere within ±75° latitude and ranked by their feature gradient weighted with cos φ, which removes the polar oversampling of uniform pixel sampling.</li>
+      </ul>
+      <img class="figure" src="assets/defdvo_erp_geometry.jpg" alt="ERP frame built from a six-camera rig, spherical-gradient patch centroids, the seam on the sphere, and deformable kernel taps.">
+      <p class="caption">(a) The six 640×640 rig views are combined into a single 2048×1024 ERP frame. (b) ERP image with spherical-gradient patch centroids and the ±75° latitude cap; the green half-boxes mark continuity across the seam. (c) On the sphere, the seam is an ordinary meridian. (d, e) 3×3 deformable-kernel taps at crops A and B: regular grid (gray squares), analytic spherical prior (blue circles), and prior plus the learned residual of the trained encoder (orange stars).</p>
+    </section>
+
+    <section>
+      <h2>Results</h2>
+      <p>Average ATE in meters (lower is better) on the real-world 360DVO benchmark and on the two TartanAirV2 evaluation sets (Set 1: 360DVO split, Set 2: CubeDVO split), and throughput on an NVIDIA RTX A5000.</p>
+      <div class="table-wrap" role="region" aria-label="Results table" tabindex="0">
+        <table>
+          <thead>
+            <tr><th rowspan="2" scope="col">Method</th><th colspan="3" scope="colgroup">360DVO dataset</th><th colspan="3" scope="colgroup">TartanAirV2</th><th rowspan="2" scope="col">FPS</th></tr>
+            <tr><th scope="col">Easy</th><th scope="col">Hard</th><th scope="col">Avg.</th><th scope="col">Set 1</th><th scope="col">Set 2</th><th scope="col">Avg.</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>OpenVSLAM</td><td>–</td><td>–</td><td>–</td><td>2.546</td><td>4.734</td><td>3.640</td><td>7.63</td></tr>
+            <tr><td>CubeDVO</td><td>n/a</td><td>n/a</td><td>n/a</td><td>n/a</td><td>1.02</td><td>n/a</td><td>n/a</td></tr>
+            <tr><td>360DVO (default)</td><td>3.60</td><td>6.06</td><td>4.83</td><td>0.202</td><td>0.142</td><td>0.172</td><td>5.96</td></tr>
+            <tr><td>360DVO (fast)</td><td>5.94</td><td>3.45</td><td>4.70</td><td>0.201</td><td>0.421</td><td>0.311</td><td>16.62</td></tr>
+            <tr class="ours"><td>DEFDVO (ours)</td><td><strong>3.26</strong></td><td><strong>3.29</strong></td><td><strong>3.27</strong></td><td><strong>0.042</strong></td><td><strong>0.088</strong></td><td><strong>0.065</strong></td><td>7.13</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption">“–” denotes tracking failure and “n/a” not available. Avg. is the mean of the two split (set) averages.</p>
+      <img class="figure" src="assets/defdvo_trajectories.jpg" alt="ERP frames and estimated trajectories of DEFDVO and 360DVO on OldTownNight and Field.">
+      <p class="caption">Qualitative trajectory comparison on OldTownNight (TartanAirV2 Set 1, hard) and Field (360DVO, hard). ERP frames (top) and estimated trajectories (bottom); all trajectories are Sim(3)-aligned to the ground truth.</p>
+    </section>
+
+    <section>
+      <h2>Citation</h2>
+      <pre><code>@misc{sevsay2026defdvodeformabledeepvisual,
+      title={DEFDVO: Deformable Deep Visual Odometry for Equirectangular Images},
+      author={Burak Sevsay and Egor Bondarev and Erkut Akdag},
+      year={2026},
+      eprint={2611.19095},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2611.19095},
+}</code></pre>
+    </section>
+
+    <footer class="footer">
+      <p>© 2026 • Project page for DEFDVO</p>
+    </footer>
+  </div>
+</body>
+</html>
