@@ -3,6 +3,7 @@
 <p align="center">
   <a href="https://arxiv.org/abs/2611.19095"><img src="https://img.shields.io/badge/arXiv-2611.19095-b31b1b?style=for-the-badge" alt="arXiv"></a>
   <a href="https://buraksevsay.github.io/DEFDVO/"><img src="https://img.shields.io/badge/Project-Page-1f1f1f?style=for-the-badge" alt="Project page"></a>
+  <a href="https://huggingface.co/papers/2611.19095"><img src="https://img.shields.io/badge/Hugging%20Face-Paper-ffd21e?style=for-the-badge&logo=huggingface&logoColor=black" alt="Hugging Face paper page"></a>
 </p>
 
 This repository contains the official implementation of the paper:
@@ -97,8 +98,19 @@ written to `runs/<name>`.
 
 ### Pretrained Model
 
-Download `DEFDVO.pth` from the [releases page](https://github.com/BurakSevsay/DEFDVO/releases) into
-`saved_checkpoints/`.
+Download `DEFDVO.pth` into `saved_checkpoints/` from either source:
+
+- **GitHub:** [releases page](https://github.com/BurakSevsay/DEFDVO/releases)
+
+  ```bash
+  wget -P saved_checkpoints https://github.com/BurakSevsay/DEFDVO/releases/download/v1.0/DEFDVO.pth
+  ```
+
+- **Hugging Face:** [buraks1/DEFDVO](https://huggingface.co/buraks1/DEFDVO) (needs `pip install -U huggingface_hub`)
+
+  ```bash
+  hf download buraks1/DEFDVO DEFDVO.pth --local-dir saved_checkpoints
+  ```
 
 ### Evaluation
 
